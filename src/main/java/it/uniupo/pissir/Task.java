@@ -1,4 +1,4 @@
-package it.uniupo.reti2;
+package it.uniupo.pissir;
 
 /**
  * Describe a Task with its properties.
@@ -46,6 +46,10 @@ public class Task {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int Id) {
+        this.id = Id;
     }
 
     public String getDescription() {

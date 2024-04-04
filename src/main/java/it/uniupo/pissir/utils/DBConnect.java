@@ -1,4 +1,4 @@
-package it.uniupo.reti2.utils;
+package it.uniupo.pissir.utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

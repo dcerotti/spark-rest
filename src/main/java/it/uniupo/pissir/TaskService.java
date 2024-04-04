@@ -1,4 +1,4 @@
-package it.uniupo.reti2;
+package it.uniupo.pissir;
 
 import static spark.Spark.*;
 import com.google.gson.Gson;
@@ -27,13 +27,11 @@ public class TaskService {
             response.header("Access-Control-Allow-Headers", "Content-Type");
         });
 
-
         // get all the tasks
         get(baseURL + "/tasks", "application/json", (request, response) -> {
             // set a proper response code and type
             response.type("application/json");
             response.status(200);
-
             // get all tasks from the DB
             List<Task> allTasks = taskDao.getAllTasks();
             // prepare the JSON-related structure to return
@@ -67,6 +65,8 @@ public class TaskService {
         post(baseURL + "/tasks", "application/json", (request, response) -> {
             // get the body of the HTTP request
             Map addRequest = gson.fromJson(request.body(), Map.class);
+            Task task;
+            Map<String, Task> finalJson = new HashMap<>();
 
             // check whether everything is in place
             if(addRequest!=null && addRequest.containsKey("description") && addRequest.containsKey("urgent")) {
@@ -75,14 +75,38 @@ public class TaskService {
                 int urgent = ((Double) addRequest.get("urgent")).intValue();
 
                 // add the task into the DB
-                taskDao.addTask(new Task(description, urgent));
+                task = taskDao.addTask(new Task(description, urgent));
 
+                // no task? 404!
+                if(task==null)
+                    halt(404);
+
+                // prepare the JSON-related structure to return
+                // and the suitable HTTP response code and type
+                finalJson.put("task", task);
+                response.type("application/json");
                 // if success, prepare a suitable HTTP response code
                 response.status(201);
             }
             else {
                 halt(403);
             }
+
+            return finalJson;
+        },gson::toJson);
+
+        // delete a single task
+        delete(baseURL + "/tasks/:id", "application/json", (request, response) -> {
+            // get the id from the URL
+            int exitval = taskDao.deleteTask(Integer.valueOf(request.params(":id")));
+
+            // no task? 404!
+            if(exitval ==0 )
+                halt(404);
+
+            // return the suitable HTTP response code and type
+            response.status(200);
+            response.type("application/json");
 
             return "";
         });
