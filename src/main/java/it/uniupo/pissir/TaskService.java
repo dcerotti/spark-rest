@@ -38,8 +38,8 @@ public class TaskService {
             Map<String, List<Task>> finalJson = new HashMap<>();
             finalJson.put("tasks", allTasks);
 
-            return finalJson;
-        }, gson::toJson);
+            return gson.toJson(finalJson);
+        });
 
 
         // get a single task
